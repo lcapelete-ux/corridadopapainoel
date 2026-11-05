@@ -246,9 +246,9 @@ sgSP=.085,
 sgL=sgPT.slice(1).map((p,i)=>Math.hypot(p.x-sgPT[i].x,p.y-sgPT[i].y)),
 sgLEN=sgL.reduce((a,b)=>a+b,0),
 sgPA=[1300,1800,1800,1800,1800,1800,5200],
-sgTOTAL=sgPA.reduce((a,b)=>a+b,0)+sgL.reduce((a,b)=>a+b/sgSP,0),
+sgV=i=>sgSP*(1-.32*i/6),sgTOTAL=sgPA.reduce((a,b)=>a+b,0)+sgL.reduce((a,b,i)=>a+b/sgV(i),0),
 sgD="M "+sgPT.map(p=>p.x+","+p.y).join(" L "),
-sgAt=t=>{let c=0,cd=0;for(let i=0;i<7;i++){const P=sgPA[i];if(t<c+P)return{x:sgPT[i].x,y:sgPT[i].y,mode:"stop",k:i,drunk:i,f:cd/sgLEN};c+=P;if(i<6){const d=sgL[i]/sgSP;if(t<c+d){const u=(t-c)/d,e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,a=sgPT[i],b=sgPT[i+1];return{x:a.x+(b.x-a.x)*e,y:a.y+(b.y-a.y)*e,mode:"run",k:i,drunk:i,f:(cd+sgL[i]*e)/sgLEN}}c+=d;cd+=sgL[i]}}return{x:750,y:150,mode:"stop",k:6,drunk:6,f:1}},
+sgAt=t=>{let c=0,cd=0;for(let i=0;i<7;i++){const P=sgPA[i];if(t<c+P)return{x:sgPT[i].x,y:sgPT[i].y,mode:"stop",k:i,drunk:i,f:cd/sgLEN,t:t};c+=P;if(i<6){const d=sgL[i]/sgV(i);if(t<c+d){const u=(t-c)/d,e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,a=sgPT[i],b=sgPT[i+1];const lv=i/6,nx=-(b.y-a.y)/sgL[i],ny=(b.x-a.x)/sgL[i],w=14*lv*Math.sin(Math.PI*u)*Math.sin(2*Math.PI*u*sgL[i]/(46-18*lv));return{x:a.x+(b.x-a.x)*e+nx*w,y:a.y+(b.y-a.y)*e+ny*w,mode:"run",k:i,drunk:i,f:(cd+sgL[i]*e)/sgLEN,t:t}}c+=d;cd+=sgL[i]}}return{x:750,y:150,mode:"stop",k:6,drunk:6,f:1,t:t}},
 sgCSS=`
 .sg-box .sg-leg1{transform-box:fill-box;transform-origin:50% 0;animation:sg-leg1 .34s linear infinite}
 .sg-box .sg-leg2{transform-box:fill-box;transform-origin:50% 0;animation:sg-leg2 .34s linear infinite}
@@ -288,19 +288,19 @@ bn.useEffect(()=>{
  io.observe(el);
  return()=>{io.disconnect();cancelAnimationFrame(raf)}
 },[]);
-const run=st.mode==="run",k=st.k,fin=!run&&k===6,drunk=st.drunk,stopBar=!run&&k>=1;
+const run=st.mode==="run",k=st.k,fin=!run&&k===6,drunk=st.drunk,stopBar=!run&&k>=1,lv=drunk/6,T=st.t||0,tilt=lv*(run?15*Math.sin(T/230)+7*Math.sin(T/97):9*Math.sin(T/420)+4*Math.sin(T/150)),lvl=["Sóbrio 😇","Alegrinho 🙂","Animado 😄","Tontinho 😵","Bêbado 🥴","Muito bêbado 🥴","Chapado de Natal 🤪"][drunk],hic=run&&lv>=.33&&T%1700<650,hp=(T%1700)/650;
 
 const label=run?"Correndo para":k===0?"Largada":fin?"Saideira":"Brindando em";
 const place=run?vg[k+1].name:vg[k].name;
-const bubble=k===0?"Ho ho ho! Bora! 🏃":fin?"SAIDEIRA! Feliz Natal! 🎅🍻":"SAÚDE! 🍻";
-const bw=fin?222:k===0?132:92;const sx=Math.min(Math.max(st.x,bw/2+10),790-bw/2);
+const bubble=["Ho ho ho! Bora! 🏃","SAÚDE! 🍻","Saúde!! Mais uma! 🍻","Shaúde, galera! 🍺","Shhaúdee... hic! 🥴","Eu amo vocês, cara! 🥴","SHAIDEIRA!! Feliz Natal! hic! 🤪"][k];
+const bw=Math.round(bubble.length*6.6+26);const sx=Math.min(Math.max(st.x,bw/2+10),790-bw/2);
 const mug=(sc,key)=>h("g",{key:key,transform:"scale("+sc+")"},
   h("rect",{x:-5,y:-13,width:10,height:13,rx:1.8,fill:"#FBB117",stroke:"#b57a00",strokeWidth:.8}),
   h("rect",{x:-3,y:-11,width:2,height:9,rx:1,fill:"#fff",opacity:.45}),
   h("path",{d:"M5,-10 h3 a3,3 0 0 1 0,6.5 h-3",fill:"none",stroke:"#b57a00",strokeWidth:1.6}),
   h("circle",{cx:-3,cy:-14,r:3,fill:"#fff"}),h("circle",{cx:0,cy:-15.5,r:3.4,fill:"#fff"}),h("circle",{cx:3.2,cy:-14,r:3,fill:"#fff"}));
 const arm=(cls,fill)=>h("g",{className:cls},h("rect",{x:-2.6,y:0,width:5.2,height:14,rx:2.6,fill:fill}),h("circle",{cx:0,cy:14.5,r:3.2,fill:"#fff"}));
-const santa=h("g",{transform:"translate("+st.x+","+st.y+") scale(1.25)"},
+const santa=h("g",{transform:"translate("+st.x+","+st.y+") rotate("+tilt.toFixed(2)+") scale(1.25)"},
   h("ellipse",{cx:0,cy:0,rx:15,ry:4,fill:"rgba(0,0,0,.22)"}),
   run&&h("g",{key:"sp"},[0,1,2].map(i=>h("line",{key:i,className:"sg-speed",x1:-24-i*3,x2:-34-i*3,y1:-38+i*10,y2:-38+i*10,stroke:"#fff",strokeWidth:2.4,strokeLinecap:"round",style:{animationDelay:i*.12+"s"}}))),
   run&&h("g",{key:"du"},[0,1].map(i=>h("circle",{key:i,className:"sg-dust",cx:-14-i*5,cy:-3,r:4,fill:"#fff",style:{animationDelay:i*.25+"s"}}))),
@@ -315,18 +315,20 @@ const santa=h("g",{transform:"translate("+st.x+","+st.y+") scale(1.25)"},
     h("rect",{x:-3.2,y:-26,width:6.4,height:6.4,rx:1,fill:"#FBB117"}),
     h("rect",{x:-11,y:-15,width:22,height:3.4,rx:1.7,fill:"#fff"}),
     h("circle",{cx:0,cy:-42,r:8.8,fill:"#f5cba7"}),
-    h("circle",{cx:-5.2,cy:-39.5,r:2.2,fill:"#f08080",opacity:.5}),h("circle",{cx:5.2,cy:-39.5,r:2.2,fill:"#f08080",opacity:.5}),
+    h("circle",{cx:-5.2,cy:-39.5,r:2.2+lv*1.6,fill:lv>.4?"#ff5252":"#f08080",opacity:.45+lv*.4}),h("circle",{cx:5.2,cy:-39.5,r:2.2+lv*1.6,fill:lv>.4?"#ff5252":"#f08080",opacity:.45+lv*.4}),
     h("path",{d:"M-8.8,-42 Q-10,-29 0,-28.5 Q10,-29 8.8,-42 Q4.5,-36.5 0,-36.5 Q-4.5,-36.5 -8.8,-42 Z",fill:"#fff"}),
-    h("circle",{cx:-3.1,cy:-44,r:1.1,fill:"#222"}),h("circle",{cx:3.1,cy:-44,r:1.1,fill:"#222"}),
-    h("circle",{cx:0,cy:-41,r:1.9,fill:"#e57373"}),
-    h("path",{d:"M-9.8,-47 Q-8.5,-64 7,-61 Q11.5,-54 9.8,-47 Z",fill:"#D42426"}),
+    lv<.5?[h("circle",{key:"e1",cx:-3.1,cy:-44,r:1.1,fill:"#222"}),h("circle",{key:"e2",cx:3.1,cy:-44,r:1.1,fill:"#222"})]:lv<.8?[h("path",{key:"e1",d:"M-4.8,-44 q1.7,1.4 3.4,0",fill:"none",stroke:"#222",strokeWidth:1.1,strokeLinecap:"round"}),h("path",{key:"e2",d:"M1.4,-44 q1.7,1.4 3.4,0",fill:"none",stroke:"#222",strokeWidth:1.1,strokeLinecap:"round"})]:[-3.1,3.1].map((ex,j)=>h("path",{key:"e"+j,transform:"translate("+ex+",-44) rotate("+(T/4%360)+")",d:"M0,0 a.6,.6 0 1,1 .9,-.4 a1.3,1.3 0 1,1 -2,1 a2,2 0 1,1 3.1,-1.3",fill:"none",stroke:"#222",strokeWidth:.7,strokeLinecap:"round"})),
+    h("circle",{cx:0,cy:-41,r:1.9+lv*1.1,fill:lv>.3?"#e53935":"#e57373"}),
+    h("g",{transform:"rotate("+(lv*26).toFixed(1)+",0,-47)"},h("path",{d:"M-9.8,-47 Q-8.5,-64 7,-61 Q11.5,-54 9.8,-47 Z",fill:"#D42426"}),
     h("rect",{x:-10.6,y:-49.5,width:21.2,height:5.4,rx:2.7,fill:"#fff"}),
-    h("circle",{className:run?"sg-pom":"",cx:8.5,cy:-62,r:3.5,fill:"#fff"}),
-    run?h("g",{transform:"translate(2,-31)"},arm("sg-arm1","#D42426")):h("g",{key:"up"},
+    h("circle",{className:run?"sg-pom":"",cx:8.5,cy:-62,r:3.5,fill:"#fff"})),
+    run&&lv<.5?h("g",{transform:"translate(2,-31)"},arm("sg-arm1","#D42426")):h("g",{key:"up"},
       h("g",{transform:"translate(2,-31) rotate(-110)"},h("rect",{x:-2.6,y:0,width:5.2,height:14,rx:2.6,fill:"#D42426"})),
-      h("g",{transform:"translate(15.6,-36)"},h("g",{className:"sg-cheers"},mug(1,"m")))
+      h("g",{transform:"translate(15.6,-36)"},h("g",{className:"sg-cheers"},drunk>0||run?mug(1,"m"):h("circle",{r:3.4,fill:"#fff"})))
     )
   ),
+  lv>=.66&&h("g",{key:"st"},[0,1,2].map(j=>{const an=T/(330-lv*90)+j*2.094;return h("text",{key:j,x:Math.cos(an)*13,y:-70+Math.sin(an)*3.5,textAnchor:"middle",fontSize:7,fill:"#FBB117",stroke:"#b57a00",strokeWidth:.3},"★")})),
+  hic&&h("text",{key:"hic",x:14,y:-64-hp*12,fontSize:8,fontWeight:800,fill:"#8B0000",opacity:1-hp*.8,fontFamily:"Inter,Arial,sans-serif",transform:"rotate(-12,14,-64)"},"hic!"),
   stopBar&&h("g",{key:"fm"+k+"-"+cyc,transform:"translate(15.6,-54)"},[0,1,2,3].map(i=>h("circle",{key:i,className:"sg-rise",cx:-4+i*2.8,cy:0,r:1.6+(i%2)*.7,fill:"#fff",stroke:"#FBB117",strokeWidth:.5,style:{animationDelay:i*.3+"s"}})))
 );
 const trees=[[120,80],[300,62],[430,120],[610,70],[90,230],[330,200],[470,335],[705,300],[245,150],[580,330]];
@@ -337,7 +339,7 @@ return h("div",{ref:box,className:"sg-box w-full bg-white rounded-xl shadow-2xl 
   h("div",{className:"flex items-center space-x-3 min-w-0"},
    h("div",{className:"bg-blue-500 p-2 rounded-full flex-shrink-0"},V.jsx(fv,{className:"w-5 h-5 text-white"})),
    h("div",{className:"min-w-0"},h("p",{className:"text-[10px] text-gray-500 font-bold uppercase"},label),h("p",{className:"text-gray-800 font-bold text-sm truncate"},place))),
-  h("div",{className:"flex items-center text-sm sm:text-lg",title:"Bares visitados"},[1,2,3,4,5,6].map(i=>h("span",{key:i,style:{display:"inline-block",opacity:i<=drunk?1:.2,filter:i<=drunk?"none":"grayscale(1)",transition:"all .3s",transform:i===drunk&&stopBar?"scale(1.4)":"scale(1)"}},"🍺"))),
+  h("div",{className:"flex flex-col items-center"},h("div",{className:"flex items-center text-sm sm:text-lg",title:"Bares visitados"},[1,2,3,4,5,6].map(i=>h("span",{key:i,style:{display:"inline-block",opacity:i<=drunk?1:.2,filter:i<=drunk?"none":"grayscale(1)",transition:"all .3s",transform:i===drunk&&stopBar?"scale(1.4)":"scale(1)"}},"🍺"))),h("p",{className:"text-[10px] font-bold uppercase text-santa-red whitespace-nowrap"},"Nível: "+lvl)),
   h("div",{className:"text-right flex-shrink-0"},h("p",{className:"text-green-600 font-bold text-sm"},(st.f*4.8).toFixed(1)+" km"),h("p",{className:"text-gray-400 text-[10px] uppercase font-bold"},"de 4.8 km"))),
  h("svg",{className:"w-full h-auto block bg-[#e5e3df]",viewBox:"0 0 800 400",preserveAspectRatio:"xMidYMid meet",style:{aspectRatio:"2/1"}},
   h("defs",null,h("pattern",{id:"blocks",x:0,y:0,width:100,height:100,patternUnits:"userSpaceOnUse"},h("rect",{x:0,y:0,width:95,height:95,fill:"#f0f0f0"}))),
