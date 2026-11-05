@@ -1,0 +1,8 @@
+# Site já compilado: não há etapa de build, publica a raiz do repositório.
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
