@@ -13,3 +13,8 @@ Todos os caminhos são relativos, então funciona tanto no GitHub Pages quanto n
 1. **Add new site → Import an existing project** → escolha este repositório.
 2. Deixe o build command vazio; o `netlify.toml` já define a pasta publicada (`.`).
 3. Ou arraste a pasta do projeto em **app.netlify.com/drop**.
+
+## Inscrições (abrir/encerrar)
+- Rodar `supabase/setup.sql`, `supabase/admin.sql` e `supabase/inscricoes.sql` no SQL Editor do Supabase (nessa ordem, uma vez).
+- No painel (Acesso Restrito Admin → aba **Controle de Inscrições**): abrir/encerrar na hora, limite de inscritos e data/hora de abertura e encerramento.
+- A regra também é aplicada no banco (trigger), então ninguém consegue se inscrever fora do período ou acima do limite.
