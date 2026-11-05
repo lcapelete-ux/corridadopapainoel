@@ -64,3 +64,7 @@ end $$;
 drop trigger if exists registrations_pay_guard on public.registrations;
 create trigger registrations_pay_guard before update on public.registrations
   for each row execute function public.registrations_pay_guard();
+
+-- Nome de quem pagou, quando o Pix saiu de outra conta (sem comprovante)
+alter table public.registrations
+  add column if not exists payer_name text check (payer_name is null or char_length(payer_name) <= 80);
