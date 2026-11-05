@@ -16,8 +16,10 @@ create table if not exists public.registration_settings (
   closes_at        timestamptz,
   price            numeric not null default 60,
   payment_info     text,
+  allow_sober      boolean not null default true,
   updated_at       timestamptz not null default now()
 );
+alter table public.registration_settings add column if not exists allow_sober boolean not null default true;
 insert into public.registration_settings (id) values (1) on conflict (id) do nothing;
 
 alter table public.registration_settings enable row level security;
@@ -63,7 +65,8 @@ begin
     'aberta', ok, 'motivo', why, 'modo', s.manual_status,
     'total', n, 'limite', s.max_registrations,
     'abre_em', s.opens_at, 'fecha_em', s.closes_at,
-    'valor', s.price, 'pagamento', s.payment_info);
+    'valor', s.price, 'pagamento', s.payment_info,
+    'permite_isento', s.allow_sober);
 end $$;
 
 grant execute on function public.inscricoes_status() to anon, authenticated;
@@ -77,6 +80,10 @@ begin
   perform pg_advisory_xact_lock(7777);   -- evita passar do limite com cliques simultâneos
   if not coalesce((public.inscricoes_status() ->> 'aberta')::boolean, false) then
     raise exception 'Inscrições encerradas' using errcode = 'P0001';
+  end if;
+  if new.file_url = 'ISENTO'
+     and not coalesce((public.inscricoes_status() ->> 'permite_isento')::boolean, true) then
+    raise exception 'Inscrição sem cerveja não está disponível' using errcode = 'P0001';
   end if;
   return new;
 end $$;

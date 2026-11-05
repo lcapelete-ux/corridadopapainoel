@@ -373,14 +373,14 @@ const h=bn.createElement,[inf,setInf]=bn.useState(null),[bad,setBad]=bn.useState
 const load=async()=>{lt.current=Date.now();try{const{data:d,error:e}=await Wo.rpc("inscricoes_status");if(e)throw e;setInf(d);setBad(!1)}catch{setBad(!0)}};
 bn.useEffect(()=>{load();const a=setInterval(load,30000),b=setInterval(()=>setNow(Date.now()),1000);return()=>{clearInterval(a);clearInterval(b)}},[]);
 bn.useEffect(()=>{if(!inf||Date.now()-lt.current<4000)return;const ab=inf.abre_em&&new Date(inf.abre_em).getTime(),fe=inf.fecha_em&&new Date(inf.fecha_em).getTime();if((inf.motivo==="antes"&&ab&&now>=ab)||(inf.aberta&&fe&&now>=fe))load()},[now]);
-const set=(k,v)=>setF(P=>({...P,[k]:v}));
+const set=(k,v)=>setF(P=>({...P,[k]:v})),pm=!!inf&&inf.permite_isento===!1,md=pm?"pago":f.mod;
 const send=async e=>{e.preventDefault();const ph=f.phone.replace(/\D/g,"");
  if(f.first_name.trim().length<2||f.last_name.trim().length<2){alert("Preencha nome e sobrenome.");return}
  if(ph.length<10){alert("Digite um WhatsApp válido, com DDD.");return}
- if(f.mod==="pago"){if(!file){alert("Anexe o comprovante do Pix.");return}if(file.size>5*1024*1024){alert("O comprovante pode ter no máximo 5 MB.");return}}
+ if(md==="pago"){if(!file){alert("Anexe o comprovante do Pix.");return}if(file.size>5*1024*1024){alert("O comprovante pode ter no máximo 5 MB.");return}}
  setBusy(!0);
  try{let url="ISENTO";
-  if(f.mod==="pago"){const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg",nm=(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(36).slice(2))+"."+ext,{error:u}=await Wo.storage.from("comprovantes").upload(nm,file,{contentType:file.type||"application/octet-stream",upsert:!1});if(u)throw u;url=Wo.storage.from("comprovantes").getPublicUrl(nm).data.publicUrl}
+  if(md==="pago"){const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg",nm=(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(36).slice(2))+"."+ext,{error:u}=await Wo.storage.from("comprovantes").upload(nm,file,{contentType:file.type||"application/octet-stream",upsert:!1});if(u)throw u;url=Wo.storage.from("comprovantes").getPublicUrl(nm).data.publicUrl}
   const{error:i}=await Wo.from("registrations").insert({first_name:f.first_name.trim(),last_name:f.last_name.trim(),phone:ph,email:f.email.trim()||null,file_url:url});if(i)throw i;
   setDone(!0)}catch(x){const m=x&&x.message||String(x);alert(/encerrad|row-level|policy/i.test(m)?"As inscrições estão encerradas.":"Não foi possível concluir a inscrição: "+m)}
  setBusy(!1);load()};
@@ -399,9 +399,9 @@ else if(inf.aberta){
    h("input",{className:inp,placeholder:"Sobrenome",value:f.last_name,onChange:e=>set("last_name",e.target.value),required:!0,maxLength:60})),
   h("input",{className:inp,placeholder:"WhatsApp com DDD",type:"tel",inputMode:"tel",value:f.phone,onChange:e=>set("phone",e.target.value),required:!0,maxLength:20}),
   h("input",{className:inp,placeholder:"E-mail (opcional)",type:"email",value:f.email,onChange:e=>set("email",e.target.value),maxLength:80}),
-  h("div",{className:"grid grid-cols-2 gap-3"},
-   [["pago","🍺 Com cerveja","Pago"],["isento","🏃 Só corrida","Grátis"]].map(o=>h("button",{key:o[0],type:"button",onClick:()=>set("mod",o[0]),className:"rounded-xl border-2 p-3 text-center transition-all "+(f.mod===o[0]?"border-santa-red bg-red-50 text-santa-dark font-bold":"border-gray-200 text-gray-500")},h("div",{className:"text-sm"},o[1]),h("div",{className:"text-[10px] uppercase tracking-widest"},o[0]==="pago"?"R$ "+Number(inf.valor||60).toFixed(2).replace(".",","):o[2])))),
-  f.mod==="pago"&&h("div",{className:"bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-gray-700"},
+  h("div",{className:"grid gap-3 "+(pm?"grid-cols-1":"grid-cols-2")},
+   [["pago","🍺 Com cerveja","Pago"],["isento","🏃 Só corrida","Grátis"]].filter(o=>o[0]==="pago"||!pm).map(o=>h("button",{key:o[0],type:"button",onClick:()=>set("mod",o[0]),className:"rounded-xl border-2 p-3 text-center transition-all "+(md===o[0]?"border-santa-red bg-red-50 text-santa-dark font-bold":"border-gray-200 text-gray-500")},h("div",{className:"text-sm"},o[1]),h("div",{className:"text-[10px] uppercase tracking-widest"},o[0]==="pago"?"R$ "+Number(inf.valor||60).toFixed(2).replace(".",","):o[2])))),
+  md==="pago"&&h("div",{className:"bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-gray-700"},
    inf.pagamento?h("p",{className:"whitespace-pre-line mb-2"},inf.pagamento):h("p",{className:"mb-2"},"Faça o Pix de R$ "+Number(inf.valor||60).toFixed(2).replace(".",",")+" e anexe o comprovante."),
    h("label",{className:"block text-xs font-bold text-gray-600 mb-1"},"Comprovante (imagem ou PDF, até 5 MB)"),
    h("input",{type:"file",accept:"image/*,application/pdf",onChange:e=>setFile(e.target.files&&e.target.files[0]||null),className:"text-xs w-full"})),
@@ -421,14 +421,14 @@ sgCfg=()=>{
 const h=bn.createElement,[cf,setCf]=bn.useState(null),[inf,setInf]=bn.useState(null),[msg,setMsg]=bn.useState(null),[busy,setBusy]=bn.useState(!1);
 const p2=n=>String(n).padStart(2,"0"),toLoc=d=>{if(!d)return"";const t=new Date(d);return t.getFullYear()+"-"+p2(t.getMonth()+1)+"-"+p2(t.getDate())+"T"+p2(t.getHours())+":"+p2(t.getMinutes())};
 const loadSt=async()=>{const{data:s}=await Wo.rpc("inscricoes_status");if(s)setInf(s)};
-const load=async()=>{const{data:c,error:e}=await Wo.from("registration_settings").select("*").eq("id",1).maybeSingle();if(e){setMsg({ok:!1,t:"Erro ao carregar: "+e.message});return}if(!c){setMsg({ok:!1,t:"Configuração não encontrada. Rode o arquivo supabase/inscricoes.sql no Supabase."});return}setCf({manual_status:c.manual_status,max_registrations:c.max_registrations==null?"":String(c.max_registrations),opens_at:toLoc(c.opens_at),closes_at:toLoc(c.closes_at),price:String(c.price??60),payment_info:c.payment_info||""});loadSt()};
+const load=async()=>{const{data:c,error:e}=await Wo.from("registration_settings").select("*").eq("id",1).maybeSingle();if(e){setMsg({ok:!1,t:"Erro ao carregar: "+e.message});return}if(!c){setMsg({ok:!1,t:"Configuração não encontrada. Rode o arquivo supabase/inscricoes.sql no Supabase."});return}setCf({manual_status:c.manual_status,max_registrations:c.max_registrations==null?"":String(c.max_registrations),opens_at:toLoc(c.opens_at),closes_at:toLoc(c.closes_at),price:String(c.price??60),payment_info:c.payment_info||"",allow_sober:c.allow_sober});loadSt()};
 bn.useEffect(()=>{load();const a=setInterval(loadSt,15000);return()=>clearInterval(a)},[]);
 const save=async(patch,ok)=>{const c={...cf,...patch};
  const mx=c.max_registrations===""?null:parseInt(c.max_registrations,10);
  if(mx!==null&&(!(mx>0)||isNaN(mx))){setMsg({ok:!1,t:"O limite de inscritos precisa ser um número maior que zero (ou deixe vazio para sem limite)."});return}
  if(c.opens_at&&c.closes_at&&new Date(c.closes_at)<=new Date(c.opens_at)){setMsg({ok:!1,t:"O encerramento precisa ser depois da abertura."});return}
  setBusy(!0);setMsg(null);
- const{data:d,error:e}=await Wo.from("registration_settings").update({manual_status:c.manual_status,max_registrations:mx,opens_at:c.opens_at?new Date(c.opens_at).toISOString():null,closes_at:c.closes_at?new Date(c.closes_at).toISOString():null,price:parseFloat(String(c.price).replace(",","."))||60,payment_info:c.payment_info.trim()||null,updated_at:new Date().toISOString()}).eq("id",1).select();
+ const{data:d,error:e}=await Wo.from("registration_settings").update({manual_status:c.manual_status,max_registrations:mx,opens_at:c.opens_at?new Date(c.opens_at).toISOString():null,closes_at:c.closes_at?new Date(c.closes_at).toISOString():null,price:parseFloat(String(c.price).replace(",","."))||60,payment_info:c.payment_info.trim()||null,...(c.allow_sober===void 0?{}:{allow_sober:c.allow_sober}),updated_at:new Date().toISOString()}).eq("id",1).select();
  setBusy(!1);
  if(e||!d||!d.length){setMsg({ok:!1,t:"Não foi possível salvar"+(e?": "+e.message:". Confira se o SQL supabase/inscricoes.sql foi executado.")});return}
  setCf(c);setMsg({ok:!0,t:ok});loadSt()};
@@ -447,6 +447,7 @@ return h("div",{className:"space-y-5"},
   h("div",{className:"flex flex-col sm:flex-row gap-3"},mb("aberta","🟢 Abrir inscrições","bg-green-600 text-white border-green-600"),mb("encerrada","🔴 Encerrar inscrições","bg-red-600 text-white border-red-600"),mb("auto","📅 Usar data e hora","bg-blue-600 text-white border-blue-600"))),
  h("div",{className:card},h("h4",{className:"font-bold text-santa-dark mb-1"},"2. Por número de inscritos"),h("p",{className:"text-xs text-gray-500 mb-3"},"Quando chegar nesse número, as inscrições encerram sozinhas, em qualquer modo. Deixe vazio para não ter limite."),
   h("label",{className:lab},"Limite de inscritos"),h("input",{type:"number",min:1,className:inp+" max-w-[12rem]",placeholder:"Sem limite",value:cf.max_registrations,onChange:e=>setCf(P=>({...P,max_registrations:e.target.value}))})),
+ h("div",{className:card},h("h4",{className:"font-bold text-santa-dark mb-1"},"Inscritos que não vão beber"),h("p",{className:"text-xs text-gray-500 mb-3"},"Liga ou desliga a opção \"🏃 Só corrida (isento)\" no formulário. Desligado, só aparece \"🍺 Com cerveja\"."),cf.allow_sober===void 0?h("p",{className:"text-sm text-red-600 font-bold"},"Rode o SQL atualizado (supabase/tudo.sql) no Supabase para liberar esta opção."):h("button",{type:"button",disabled:busy,role:"switch","aria-checked":cf.allow_sober,onClick:()=>save({allow_sober:!cf.allow_sober},cf.allow_sober?"Agora só aceita inscritos com cerveja.":"Agora aceita também inscritos que não vão beber."),className:"flex items-center gap-3 disabled:opacity-50"},h("span",{className:"relative inline-block w-14 h-8 rounded-full transition-colors "+(cf.allow_sober?"bg-green-500":"bg-gray-300")},h("span",{className:"absolute top-1 w-6 h-6 bg-white rounded-full shadow transition-all "+(cf.allow_sober?"left-7":"left-1")})),h("span",{className:"font-bold text-sm "+(cf.allow_sober?"text-green-700":"text-gray-600")},cf.allow_sober?"✅ Aceita quem não vai beber (isento)":"🚫 Só com cerveja (pago)"))),
  h("div",{className:card},h("h4",{className:"font-bold text-santa-dark mb-1"},"3. Por data e hora"),h("p",{className:"text-xs text-gray-500 mb-3"},"Só vale no modo 📅 Usar data e hora. Você pode preencher só a abertura, só o encerramento ou os dois."),
   h("div",{className:"grid sm:grid-cols-2 gap-3"},
    h("div",null,h("label",{className:lab},"Abre em"),h("input",{type:"datetime-local",className:inp,value:cf.opens_at,onChange:e=>setCf(P=>({...P,opens_at:e.target.value}))})),
