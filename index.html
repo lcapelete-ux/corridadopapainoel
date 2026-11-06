@@ -129,5 +129,62 @@
 </head>
   <body class="bg-gray-50 text-gray-800">
     <div id="root"></div>
+
+    <script>
+      // Progressive enhancement: cards stay visible if animation is unavailable.
+      (() => {
+        const root = document.getElementById('root');
+        const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (!root || motion.matches || !('IntersectionObserver' in window) ||
+            !Element.prototype.animate) return;
+
+        const seen = new WeakSet();
+        const active = new Set();
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const card = entry.target;
+            observer.unobserve(card);
+            if (!card.isConnected || motion.matches) return;
+            const animation = card.animate([
+              { opacity: 0, transform: 'translateY(28px) scale(.98)' },
+              { opacity: 1, transform: 'translateY(0) scale(1)' }
+            ], {
+              duration: 650,
+              delay: Number(card.dataset.revealOrder) * 90,
+              easing: 'cubic-bezier(.22,1,.36,1)',
+              fill: 'backwards'
+            });
+            active.add(animation);
+            const done = () => active.delete(animation);
+            animation.addEventListener('finish', done, { once: true });
+            animation.addEventListener('cancel', done, { once: true });
+          });
+        }, { threshold: 0.12 });
+
+        const register = () => {
+          root.querySelectorAll('#rules .grid > .border-t-4').forEach((card, index) => {
+            if (seen.has(card)) return;
+            seen.add(card);
+            card.dataset.revealOrder = String(index % 3);
+            observer.observe(card);
+          });
+        };
+        let frame = 0;
+        const updates = new MutationObserver(() => {
+          if (!frame) frame = requestAnimationFrame(() => { frame = 0; register(); });
+        });
+        updates.observe(root, { childList: true, subtree: true });
+        register();
+        motion.addEventListener('change', event => {
+          if (!event.matches) return;
+          observer.disconnect();
+          updates.disconnect();
+          if (frame) cancelAnimationFrame(frame);
+          active.forEach(animation => animation.cancel());
+          active.clear();
+        });
+      })();
+    </script>
 </body>
 </html>
