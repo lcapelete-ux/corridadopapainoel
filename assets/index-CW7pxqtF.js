@@ -371,11 +371,12 @@ return h("div",{ref:box,className:"sg-box w-full bg-white rounded-xl shadow-2xl 
 const go=id=>{const u=document.getElementById(id);if(u){const t=u.getBoundingClientRect().top-document.body.getBoundingClientRect().top-120;window.scrollTo({top:t,behavior:"smooth"})}};
 const R=[
  ["🔞","Só maiores de 18 anos","Tem cerveja no roteiro, então só participa quem já tem 18 anos ou mais. Pode ser pedido documento com foto.","#D42426"],
+ ["🎅","Traje oficial: gorro e camiseta branca","Gorro vermelho de Papai Noel é obrigatório, junto com camiseta branca. É o uniforme da turma!","#B71C1C"],
  ["🚚","O carro de som manda no ritmo","Ele abre o caminho e dita a velocidade da turma. É proibido passar na frente do carro de som!","#165B33"],
  ["⏳","Sem apressar a organização","Cada bar tem o seu tempo. É proibido acelerar os organizadores para trocar de bar: curta, brinde e espere o sinal.","#B57A00"],
  ["🤝","Todo mundo junto","Não é corrida de quem chega primeiro! A turma sai junto, anda junto e chega junto. Ninguém fica para trás.","#71269A"],
  ["🛑","Bebeu, não dirija","Combine a volta antes: carona com quem não bebeu, táxi, aplicativo ou a pé. O Noel quer todo mundo em casa no Natal.","#1f2937"]];
-const D=[["🎅","Venha no clima: gorro, roupa vermelha ou fantasia"],["💧","Intercale cerveja com água"],["🙌","Respeite os bares, os moradores e a turma"],["📸","Sorria: as fotos vão para o Hall da Fama"]];
+const D=[["💧","Intercale cerveja com água"],["🙌","Respeite os bares, os moradores e a turma"],["📸","Sorria: as fotos vão para o Hall da Fama"]];
 return h("section",{id:"rules",className:"py-20 relative overflow-hidden",style:{background:"#FFF8E7"}},
  h("style",null,"@keyframes sgr-march{0%{transform:translateX(-30%)}100%{transform:translateX(130%)}}@keyframes sgr-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.sgr-march{animation:sgr-march 16s linear infinite}.sgr-bob{display:inline-block;animation:sgr-bob .5s ease-in-out infinite}@media (prefers-reduced-motion:reduce){.sgr-march,.sgr-bob{animation:none!important}}"),
  h("div",{className:"absolute top-0 left-0 right-0 h-3",style:{background:"repeating-linear-gradient(45deg,#D42426 0 18px,#fff 18px 36px)"}}),
