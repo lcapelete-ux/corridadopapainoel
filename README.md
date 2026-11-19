@@ -18,3 +18,9 @@ Todos os caminhos são relativos, então funciona tanto no GitHub Pages quanto n
 - Rodar `supabase/setup.sql`, `supabase/admin.sql` e `supabase/inscricoes.sql` no SQL Editor do Supabase (nessa ordem, uma vez).
 - No painel (Acesso Restrito Admin → aba **Controle de Inscrições**): abrir/encerrar na hora, limite de inscritos e data/hora de abertura e encerramento.
 - A regra também é aplicada no banco (trigger), então ninguém consegue se inscrever fora do período ou acima do limite.
+
+## Preço por lote
+- No projeto Supabase do site, execute `supabase/lotes.sql` no SQL Editor depois de `supabase/valor-sobrio.sql` (ou `supabase/tudo.sql`).
+- Em **Admin → Controle de Inscrições → Preço por lote**, adicione os lotes, o número final de inscritos de cada um e o preço. Exemplo: até 80 por R$ X; até 150 por R$ Y. O segundo lote começa na 81ª inscrição.
+- Clique em **Salvar limite, datas e pagamento**. O preço exibido ao público é atualizado automaticamente a cada 30 segundos e o banco confirma o valor vigente no momento da inscrição. Ao atingir o fim do último lote, as inscrições encerram.
+- Sem lotes configurados, continua valendo o preço único.
