@@ -47,3 +47,9 @@ Todos os caminhos são relativos, então funciona tanto no GitHub Pages quanto n
 - No painel, a aba **📊 Visitas** mostra hoje, ontem, o período (7/30/90 dias), um gráfico por dia, a origem dos visitantes e o aparelho, com **Baixar planilha (CSV)** e **Baixar PDF**.
 - Quem entra no painel como admin deixa de ser contado naquele aparelho.
 
+## Financeiro (despesas e receitas)
+- Execute `supabase/financeiro.sql` no SQL Editor (ou o `supabase/tudo.sql` inteiro).
+- No painel, aba **💰 Financeiro**: lançar despesas e receitas com categoria, fornecedor/quem pagou, valor, data e situação (**Pago / A pagar** ou **Recebido / A receber**). Clique na situação para alternar.
+- A receita das inscrições entra sozinha (pagas = recebido; a confirmar = a receber).
+- Marcelo, wilson e fernando veem e lançam; só o marcelo apaga. Cartões com saldo atual e saldo previsto, filtros, despesas por categoria e relatório em **CSV** e **PDF** (respeitam os filtros).
+
