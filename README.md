@@ -29,3 +29,9 @@ Todos os caminhos são relativos, então funciona tanto no GitHub Pages quanto n
 ## Aviso público dos lotes e foto do kit
 - Execute `supabase/mostrar-lotes.sql` no SQL Editor do mesmo projeto Supabase para exibir todas as faixas de preço na área de inscrições.
 - No painel **Controle de Inscrições → Foto do kit da corrida**, envie uma imagem JPG, PNG ou WebP de até 5 MB. A foto aparece na área pública de inscrições.
+
+## Data de nascimento e chave Pix
+- Execute `supabase/nascimento-pix.sql` no SQL Editor (ou o `supabase/tudo.sql` inteiro).
+- A data de nascimento é obrigatória na inscrição; quem não tem 18 anos até o dia da corrida (23/12/2026) não consegue se inscrever, no site e também no banco.
+- Em **Controle de Inscrições → 4. Pagamento**, preencha **Chave Pix**: ela aparece em destaque no formulário com o botão **Copiar chave Pix**. O campo de instruções continua para o nome do recebedor e avisos.
+
