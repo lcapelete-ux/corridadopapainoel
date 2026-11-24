@@ -41,3 +41,9 @@ Todos os caminhos são relativos, então funciona tanto no GitHub Pages quanto n
 - No painel, a linha da pessoa mostra "🔔 Avisou em ..." e o novo comprovante em "Ver Comprovante". Você confere na conta e clica em **Confirmar pago**.
 - O WhatsApp (com DDD) é obrigatório no formulário e também no banco. O endereço do comprovante só é aceito se for do armazenamento do projeto.
 
+## Contador de visitas (relatório no painel)
+- Execute `supabase/visitas.sql` no SQL Editor (ou o `supabase/tudo.sql` inteiro).
+- O site registra uma visita por aba aberta, por dia, com um código aleatório e anônimo (sem nome, telefone ou IP), a origem (Instagram, WhatsApp, direto etc.) e o aparelho (celular ou computador).
+- No painel, a aba **📊 Visitas** mostra hoje, ontem, o período (7/30/90 dias), um gráfico por dia, a origem dos visitantes e o aparelho, com **Baixar planilha (CSV)** e **Baixar PDF**.
+- Quem entra no painel como admin deixa de ser contado naquele aparelho.
+
