@@ -35,3 +35,9 @@ Todos os caminhos são relativos, então funciona tanto no GitHub Pages quanto n
 - A data de nascimento é obrigatória na inscrição; quem não tem 18 anos até o dia da corrida (23/12/2026) não consegue se inscrever, no site e também no banco.
 - Em **Controle de Inscrições → 4. Pagamento**, preencha **Chave Pix**: ela aparece em destaque no formulário com o botão **Copiar chave Pix**. O campo de instruções continua para o nome do recebedor e avisos.
 
+## Avisar pagamento depois da inscrição
+- Execute `supabase/aviso-pagamento.sql` no SQL Editor (ou o `supabase/tudo.sql` inteiro).
+- Na área de inscrição aparece sempre o botão **Já me inscrevi: avisar que paguei ou enviar comprovante**. A pessoa digita o WhatsApp usado na inscrição e envia o comprovante ou marca "Já paguei" (com a conta de quem pagou). Funciona mesmo com as inscrições encerradas.
+- No painel, a linha da pessoa mostra "🔔 Avisou em ..." e o novo comprovante em "Ver Comprovante". Você confere na conta e clica em **Confirmar pago**.
+- O WhatsApp (com DDD) é obrigatório no formulário e também no banco. O endereço do comprovante só é aceito se for do armazenamento do projeto.
+
